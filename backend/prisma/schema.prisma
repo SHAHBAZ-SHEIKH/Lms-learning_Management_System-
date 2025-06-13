@@ -13,3 +13,88 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Account {
+  id                String  @id() @default(uuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text()
+  access_token      String? @db.Text()
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text()
+  session_state     String?
+  student           Student @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Student {
+  id              String        @id @default(uuid())
+  name            String?
+  email           String?       @unique
+  image           String?
+  isBlocked       Boolean       @default(false) @map("is_blocked")
+  password        String?
+  dob             DateTime?     @map("date_of_birth")
+  phoneNumber     String?       @map("phone_number")
+  address         String?
+  bio             String?
+  studentId       String        @unique @map("std_id")
+  gitHubAccount   String?       @map("github_account")
+  linkedInAccount String?       @map("linkedin_account")
+  emailVerified   DateTime?
+  emailToken      String?       @map("email_token")
+  createdAt       DateTime      @default(now()) @map(name: "created_at")
+  updatedAt       DateTime      @updatedAt() @map(name: "updated_at")
+  accounts        Account[]
+  Session         UserSession[]
+  courses         Course[]      @relation("StudentCourses")
+  role            Role          @default(STUDENT)
+  teacherId       String?
+  teacher         Teacher?      @relation(fields: [teacherId], references: [id])
+  gender          Gender
+
+  @@map("students")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now()) @map(name: "created_at")
+  updatedAt    DateTime @updatedAt() @map(name: "updated_at")
+  sessionToken String   @unique() @map("session_token")
+  expires      DateTime
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Course {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  students Student[] @relation("StudentCourses")
+}
+
+model Teacher {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  students  Student[] // one-to-many
+  createdAt DateTime  @default(now())
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
