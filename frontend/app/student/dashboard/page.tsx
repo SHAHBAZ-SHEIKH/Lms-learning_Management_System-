@@ -15,8 +15,8 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight text-[#6828CE]">Dashboard</h1>
         <p className="text-muted-foreground">Welcome back! Here's an overview of your learning progress.</p>
       </div>
+      <DashboardStats />
       <StudentProfile/>
-      {/* <DashboardStats /> */}
       <CourseList />
     </div>
   )

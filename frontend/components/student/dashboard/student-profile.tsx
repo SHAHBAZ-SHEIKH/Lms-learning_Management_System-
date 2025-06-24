@@ -24,7 +24,7 @@ export function StudentProfile() {
           </div>
         </div>
         <CardContent className="pt-20">
-          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-row gap-6 max-sm:flex-col max-lg:flex-col max-xl:flex-col md:items-center md:justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-3xl font-bold">Albart Flores</h2>

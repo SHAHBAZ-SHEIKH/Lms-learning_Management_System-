@@ -32,12 +32,12 @@ const menuItems = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
-    href: "/dashboard",
+    href: "/student/dashboard",
   },
   {
     title: "Inbox",
     icon: Inbox,
-    href: "/dashboard/inbox",
+    href: "/student/inbox",
     badge: "12",
   },
   {
