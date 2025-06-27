@@ -1,11 +1,16 @@
 import NextAuth from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import prisma from '../../../backend/lib/db';
+import prisma from '../../backend/lib/db';
 import { authConfig } from './config';
-import { createUserSessionInDB, getAccountByUserId, getStudentById, updateStudentById } from '@/services/user';
 import { generateSequentialStudentId } from '../lib/utils';
+import { createUserSessionInDB, getAccountByUserId, getStudentById, updateStudentById } from '../services/user';
 
-const { } = NextAuth({
+export const {
+    handlers: { GET, POST },
+    auth,
+    signIn,
+    signOut,
+} = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: {
         strategy: "jwt",
@@ -14,7 +19,7 @@ const { } = NextAuth({
     events: {
         async linkAccount({ user }) {
             const stdID = await generateSequentialStudentId();
-            await updateStudentById(user.id as string, { studentId: stdID, role: "STUDENT" ,emailVerified: new Date() })
+            await updateStudentById(user.id as string, { studentId: stdID, role: "STUDENT", emailVerified: new Date() })
         }
     },
     callbacks: {

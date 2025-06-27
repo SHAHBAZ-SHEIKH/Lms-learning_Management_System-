@@ -1,173 +1,154 @@
 "use client"
-import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, Github, GraduationCap, Mail } from "lucide-react"
-import { RegisterSchema } from "@/lib/schemas"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
+import { Github, GraduationCap, Mail } from "lucide-react"
 import Link from "next/link"
-
-const campuses = ["Main Campus", "North Campus", "South Campus", "East Campus", "West Campus", "Online Campus"]
-type FormValues = z.infer<typeof RegisterSchema>
+import { signIn } from "next-auth/react"
 
 export function RegisterForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState<string | null>(null)
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(RegisterSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-    },
-    mode: "onChange"
-  })
+  // const handleGitHubSignUp = async () => {
+  //   setIsLoading("github")
+  //   try {
+  //     // Add your GitHub OAuth logic here
+  //     console.log("Signing up with GitHub...")
+  //     // Simulate API call
+  //     await new Promise((resolve) => setTimeout(resolve, 2000))
+  //   } catch (error) {
+  //     console.error("GitHub signup failed:", error)
+  //   } finally {
+  //     setIsLoading(null)
+  //   }
+  // }
 
-  function onSubmit(values: FormValues) {
-    console.log(values)
-    form.reset()
+  async function handleOAuth(provider: string): Promise<void> {
+    setIsLoading(provider)
+    try {
+      const a = await signIn(provider, { callbackUrl: "/dashboard" })
+      console.log(a)
+    } catch (err) {
+      console.error(`OAuth error (${provider}):`, err)
+    } finally {
+      setIsLoading(null)
+    }
   }
 
+  // const handleAuth = async (oAuth: string) => {
+  //   setIsLoading(oAuth)
+  //   try {
+  //     // Add your OAuth logic here
+  //     console.log(`Signing up with ${oAuth}...`)
+  //     // Simulate API call
+  //     await new Promise((resolve) => setTimeout(resolve, 2000))
+  //   } catch (error) {
+  //     console.error(`${oAuth} signup failed:`, error)
+  //   } finally {
+  //     setIsLoading(null)
+  //   }
+  // }
+
+  // const handleGoogleSignUp = async () => {
+  //   setIsLoading("google")
+  //   try {
+  //     // Add your Google OAuth logic here
+  //     console.log("Signing up with Google...")
+  //     // Simulate API call
+  //     await new Promise((resolve) => setTimeout(resolve, 2000))
+  //   } catch (error) {
+  //     console.error("Google signup failed:", error)
+  //   } finally {
+  //     setIsLoading(null)
+  //   }
+  // }
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className="max-w-md w-full shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="text-center pb-6">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
-              <GraduationCap className="h-10 w-10 text-white" />
-            </div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Join Our LMS
-            </CardTitle>
-            <CardDescription className="text-gray-600 text-lg">
-              Start your learning journey with thousands of students
-            </CardDescription>
-          </CardHeader>
+    <Card className="max-w-md w-full shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+      <CardHeader className="text-center pb-8">
+        <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+          <GraduationCap className="h-10 w-10 text-white" />
+        </div>
+        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Join Our LMS
+        </CardTitle>
+        <CardDescription className="text-gray-600 text-lg">
+          Start your learning journey with thousands of students
+        </CardDescription>
+      </CardHeader>
 
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} type="text" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="campus"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Campus</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a Campus" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Campuses</SelectLabel>
-                          {campuses.map((campus) => {
-                            return (
-                              <SelectItem value={campus} key={campus}>
-                                {campus}
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <CardContent className="space-y-6">
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-6">Choose your preferred method to create an account</p>
+        </div>
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="you@example.com" {...field} type="email" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input placeholder="••••••••" type={showPassword ? "text" : "password"} {...field} />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                        )}
-                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full mt-4" disabled={isLoading}>
-              {isLoading ? "Signing Up..." : "Sign Up"}
-            </Button>
-            <div className="relative text-center text-sm">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border"></span>
+        <div className="space-y-4">
+          <Button
+            variant="outline"
+            type="button"
+            className="w-full h-12 text-base font-medium hover:bg-gray-50 transition-colors bg-transparent"
+            onClick={() => handleOAuth("github")}
+            disabled={isLoading !== null}
+          >
+            {isLoading === "github" ? (
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-2"></div>
+                Connecting...
               </div>
-              <div className="relative flex justify-center">
-                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button" className="w-full">
-                <Github className="mr-2 h-4 w-4" />
-                GitHub
-              </Button>
-              <Button variant="outline" type="button" className="w-full">
-                <Mail className="mr-2 h-4 w-4" />
-                Google
-              </Button>
-            </div>
+            ) : (
+              <>
+                <Github className="mr-3 h-5 w-5" />
+                Continue with GitHub
+              </>
+            )}
+          </Button>
 
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Already have an account? <Link href="/auth/login" className="text-blue-600 underline">Login</Link>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
-    </Form>
+          <Button
+            variant="outline"
+            type="button"
+            className="w-full h-12 text-base font-medium hover:bg-gray-50 transition-colors bg-transparent"
+            onClick={() => handleOAuth("github")}
+            disabled={isLoading !== null}
+          >
+            {isLoading === "google" ? (
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-2"></div>
+                Connecting...
+              </div>
+            ) : (
+              <>
+                <Mail className="mr-3 h-5 w-5" />
+                Continue with Google
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-gray-600">
+            Already have an account?{" "}
+            <Link
+              href="/auth/login"
+              className="text-blue-600 hover:text-blue-700 underline font-medium transition-colors"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500">
+            By continuing, you agree to our{" "}
+            <Link href="/terms" className="underline hover:text-gray-700">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="underline hover:text-gray-700">
+              Privacy Policy
+            </Link>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
